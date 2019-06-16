@@ -1,11 +1,10 @@
 import sys
 import os
 import serial
-import time
 from PyQt5.QtWidgets import (QApplication, QWidget, QMessageBox,
-    QPushButton, QGridLayout)
+    QPushButton, QGridLayout, QLineEdit)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt
 
 # Set COM port for arduino
 
@@ -70,7 +69,7 @@ class Window(QWidget):
 
         colors = ['RGB White', 'True White', 'Warm White',
           'Red', 'Blue', 'Green']
-        positions = [(i,j) for i in range (5,8) for j in range(3)]
+        positions = [(i,j) for i in range (4,7) for j in range(3)]
 
         for position, color in zip(positions, colors):
             if color == '':
@@ -79,6 +78,11 @@ class Window(QWidget):
             button.setToolTip(f'Sets the light to {color}.')
             button.clicked.connect(self.color_set)
             grid.addWidget(button, *position)
+
+        self.color_feedback = QLineEdit()
+        self.color_feedback.setReadOnly(True)
+        self.color_feedback.setAlignment(Qt.AlignCenter)
+        grid.addWidget(self.color_feedback,7,0,1,3)
 
         self.resize(400,400)
         self.setWindowTitle(name)
@@ -103,47 +107,47 @@ class Window(QWidget):
 
     @pyqtSlot()
     def power_on(self):
-        print('The light has been turned on.')
+        self.color_feedback.setText('The light has been turned on.')
         ser.write(b'lightOn')
 
     @pyqtSlot()
     def power_off(self):
-        print('The light has been turned off.')
+        self.color_feedback.setText('The light has been turned off.')
         ser.write(b'lightOff')
 
     @pyqtSlot()
     def dim_light(self):
-        print('The brightness has been decreased.')
+        self.color_feedback.setText('The brightness has been decreased.')
         ser.write(b'dim')
 
     @pyqtSlot()
     def brighten_light(self):
-        print('The brightness has been increased')
+        self.color_feedback.setText('The brightness has been increased.')
         ser.write(b'bright')
 
     @pyqtSlot()
     def prev_color(self):
-        print('Switched to previous color.')
+        self.color_feedback.setText('Switched to previous color.')
         ser.write(b'prevColor')
 
     @pyqtSlot()
     def next_color(self):
-        print('Switched to next color.')
+        self.color_feedback.setText('Switched to next color.')
         ser.write(b'nextColor')
 
     @pyqtSlot()
     def slow_cycle(self):
-        print('Set to slow cycle mode.')
+        self.color_feedback.setText('Set to slow cycle mode.')
         ser.write(b'slowCycle')
 
     @pyqtSlot()
     def mode(self):
-        print('Cycled the lighting mode.')
+        self.color_feedback.setText('Cycled the lighting mode.')
         ser.write(b'modeSwitch')
 
     @pyqtSlot()
     def fast_cycle(self):
-        print('Set to fast cycle mode.')
+        self.color_feedback.setText('Set to fast cycle mode.')
         ser.write(b'fastCycle')
 
     @pyqtSlot()
@@ -161,7 +165,7 @@ class Window(QWidget):
         color_code = color_codes[colors.index(color)]
         ser.write(f'{color_code}'.encode())
 
-        print(message)
+        self.color_feedback.setText(message)
 
 if __name__ == '__main__':
 
